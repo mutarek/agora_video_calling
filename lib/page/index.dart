@@ -1,8 +1,10 @@
 import 'dart:async';
 
-import 'package:agora_rtc_engine/rtc_engine.dart';
+//import 'package:agora_rtc_engine/rtc_engine.dart';
+import 'package:agora_rtc_engine/agora_rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:videocallingappdemo/page/video_call.dart';
 
 import './call.dart';
 
@@ -18,7 +20,7 @@ class IndexState extends State<IndexPage> {
   /// if channel textField is validated to have error
   bool _validateError = false;
 
-  ClientRole? _role = ClientRole.Broadcaster;
+  ClientRoleType? _role = ClientRoleType.clientRoleBroadcaster;
 
   @override
   void dispose() {
@@ -59,11 +61,12 @@ class IndexState extends State<IndexPage> {
               Column(
                 children: [
                   ListTile(
-                    title: Text(ClientRole.Broadcaster.toString()),
+                    title:
+                        Text(ClientRoleType.clientRoleBroadcaster.toString()),
                     leading: Radio(
-                      value: ClientRole.Broadcaster,
+                      value: ClientRoleType.clientRoleBroadcaster,
                       groupValue: _role,
-                      onChanged: (ClientRole? value) {
+                      onChanged: (ClientRoleType? value) {
                         setState(() {
                           _role = value;
                         });
@@ -71,11 +74,11 @@ class IndexState extends State<IndexPage> {
                     ),
                   ),
                   ListTile(
-                    title: Text(ClientRole.Audience.toString()),
+                    title: Text(ClientRoleType.clientRoleAudience.toString()),
                     leading: Radio(
-                      value: ClientRole.Audience,
+                      value: ClientRoleType.clientRoleAudience,
                       groupValue: _role,
-                      onChanged: (ClientRole? value) {
+                      onChanged: (ClientRoleType? value) {
                         setState(() {
                           _role = value;
                         });
@@ -90,8 +93,17 @@ class IndexState extends State<IndexPage> {
                   children: <Widget>[
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: onJoin,
-                        child: Text('Join'),
+                        onPressed: () async {
+                          await _handleCameraAndMic(Permission.camera);
+                          await _handleCameraAndMic(Permission.microphone);
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoCall(videoCall: false),
+                            ),
+                          );
+                        },
+                        child: const Text('Audio Call'),
                         style: ButtonStyle(
                             backgroundColor:
                                 MaterialStateProperty.all(Colors.blueAccent),
@@ -109,7 +121,42 @@ class IndexState extends State<IndexPage> {
                     // )
                   ],
                 ),
-              )
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await _handleCameraAndMic(Permission.camera);
+                          await _handleCameraAndMic(Permission.microphone);
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => VideoCall(videoCall: false),
+                            ),
+                          );
+                        },
+                        child: const Text('Video Call'),
+                        style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all(Colors.blueAccent),
+                            foregroundColor:
+                                MaterialStateProperty.all(Colors.white)),
+                      ),
+                    ),
+                    // Expanded(
+                    //   child: RaisedButton(
+                    //     onPressed: onJoin,
+                    //     child: Text('Join'),
+                    //     color: Colors.blueAccent,
+                    //     textColor: Colors.white,
+                    //   ),
+                    // )
+                  ],
+                ),
+              ),
             ],
           ),
         ),
@@ -129,15 +176,12 @@ class IndexState extends State<IndexPage> {
       await _handleCameraAndMic(Permission.camera);
       await _handleCameraAndMic(Permission.microphone);
       // push video page with given channel name
-      await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CallPage(
-            channelName: _channelController.text,
-            role: _role,
-          ),
-        ),
-      );
+      // await Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => VideoCall(),
+      //   ),
+      // );
     }
   }
 
