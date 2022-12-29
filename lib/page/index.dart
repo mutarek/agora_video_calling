@@ -93,51 +93,7 @@ class IndexState extends State<IndexPage> {
                   children: <Widget>[
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: () async {
-                          await _handleCameraAndMic(Permission.camera);
-                          await _handleCameraAndMic(Permission.microphone);
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VideoCall(videoCall: false),
-                            ),
-                          );
-                        },
-                        child: const Text('Audio Call'),
-                        style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.blueAccent),
-                            foregroundColor:
-                                MaterialStateProperty.all(Colors.white)),
-                      ),
-                    ),
-                    // Expanded(
-                    //   child: RaisedButton(
-                    //     onPressed: onJoin,
-                    //     child: Text('Join'),
-                    //     color: Colors.blueAccent,
-                    //     textColor: Colors.white,
-                    //   ),
-                    // )
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          await _handleCameraAndMic(Permission.camera);
-                          await _handleCameraAndMic(Permission.microphone);
-                          await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => VideoCall(videoCall: false),
-                            ),
-                          );
-                        },
+                        onPressed: onJoin,
                         child: const Text('Video Call'),
                         style: ButtonStyle(
                             backgroundColor:
@@ -175,13 +131,12 @@ class IndexState extends State<IndexPage> {
       // await for camera and mic permissions before pushing video page
       await _handleCameraAndMic(Permission.camera);
       await _handleCameraAndMic(Permission.microphone);
-      // push video page with given channel name
-      // await Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) => VideoCall(),
-      //   ),
-      // );
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VideoCall(),
+        ),
+      );
     }
   }
 

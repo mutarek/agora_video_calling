@@ -26,7 +26,6 @@ class CallController extends GetxController {
   void onClose() {
     super.onClose();
     clear();
-    engine.leaveChannel();
   }
 
   clear() {
@@ -52,7 +51,7 @@ class CallController extends GetxController {
       await engine.leaveChannel();
       await engine.joinChannel(
         token: token,
-        channelId: "mychannel",
+        channelId: channgeId,
         uid: 0,
         options: const ChannelMediaOptions(),
       );
@@ -87,19 +86,44 @@ class CallController extends GetxController {
               UserOfflineReasonType reason) {
             if (reason == UserOfflineReasonType.userOfflineDropped) {
               Wakelock.disable();
+              myremoteUid.value = 0;
+              onCallEnd();
+              update();
             } else {
               myremoteUid.value = 0;
+              onCallEnd();
+              update();
+            }
+          },
+          onRemoteVideoStats:
+              (RtcConnection connection, RemoteVideoStats remoteVideoStats) {
+            if (remoteVideoStats.receivedBitrate == 0) {
+              videoPaused.value = true;
+              update();
+            } else {
+              videoPaused.value = false;
               update();
             }
           },
           onTokenPrivilegeWillExpire:
               (RtcConnection connection, String token) {},
-          onLeaveChannel: (RtcConnection connection, stats) {}),
+          onLeaveChannel: (RtcConnection connection, stats) {
+            clear();
+            onCallEnd();
+            update();
+          }),
     );
+  }
+
+  void onVideoOff() {
+    mutedVideo.value = !mutedVideo.value;
+    engine.muteLocalVideoStream(mutedVideo.value);
+    update();
   }
 
   void onCallEnd() {
     clear();
+    update();
     Get.offAll(() => IndexPage());
   }
 
@@ -112,6 +136,7 @@ class CallController extends GetxController {
   void onToggleMuteVideo() {
     mutedVideo.value = !mutedVideo.value;
     engine.muteLocalVideoStream(mutedVideo.value);
+    update();
   }
 
   void onSwitchCamera() {
